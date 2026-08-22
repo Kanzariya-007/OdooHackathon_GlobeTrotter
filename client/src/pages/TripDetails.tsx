@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { 
-  ArrowLeft, Edit2, Share2, Calendar, MapPin, 
+import {
+  ArrowLeft, Edit2, Share2, Calendar, MapPin,
   DollarSign, Activity, ListOrdered, PiggyBank, Copy, Check, Compass,
   Trash2, AlertCircle, Plus
 } from 'lucide-react';
@@ -24,7 +24,7 @@ export const TripDetails: React.FC = () => {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Share Modal state
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -84,7 +84,7 @@ export const TripDetails: React.FC = () => {
     const end = new Date(trip.endDate);
     const days = [];
     const current = new Date(start);
-    
+
     let maxDays = 100;
     while (current <= end && maxDays > 0) {
       days.push(new Date(current));
@@ -127,10 +127,10 @@ export const TripDetails: React.FC = () => {
   if (error || !trip) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Error 
-          title="Trip Details Unavailable" 
-          message={error || "Unable to display details for this trip ID."} 
-          onRetry={() => window.location.reload()} 
+        <Error
+          title="Trip Details Unavailable"
+          message={error || "Unable to display details for this trip ID."}
+          onRetry={() => window.location.reload()}
         />
       </div>
     );
@@ -159,10 +159,10 @@ export const TripDetails: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 text-left">
-      
+
       {/* Back Button and Banner Header */}
       <div className="relative rounded-2xl overflow-hidden shadow-md border border-slate-100 bg-slate-950">
-        
+
         {/* Cover Background */}
         <div className="h-64 sm:h-72 w-full overflow-hidden relative">
           <img src={coverUrl} alt="" className="w-full h-full object-cover opacity-75" />
@@ -247,11 +247,10 @@ export const TripDetails: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 pb-3.5 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all ${
-              activeTab === tab.id
+            className={`flex items-center gap-2 pb-3.5 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all ${activeTab === tab.id
                 ? 'border-indigo-600 text-indigo-600'
                 : 'border-transparent text-slate-400 hover:text-slate-600'
-            }`}
+              }`}
           >
             {tab.icon}
             {tab.name}
@@ -261,7 +260,7 @@ export const TripDetails: React.FC = () => {
 
       {/* Tab Contents */}
       <div className="min-h-[30vh]">
-        
+
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
@@ -332,14 +331,6 @@ export const TripDetails: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Tips list count */}
-              <div className="bg-indigo-900/5 border border-indigo-100 rounded-xl p-4.5">
-                <h4 className="text-xs font-bold text-indigo-900 uppercase tracking-widest mb-1.5">Note for Member 2 & 4</h4>
-                <p className="text-[11px] text-indigo-700/80 leading-normal">
-                  The tabs below contain basic placeholder interfaces. Feel free to integrate dynamic controls (City Discovery, Activity scheduling, Recharts donut rendering, vertical timeline items) directly into the Itinerary, Budget, or Timeline structures.
-                </p>
-              </div>
             </div>
           </div>
         )}
@@ -376,9 +367,9 @@ export const TripDetails: React.FC = () => {
               </div>
             </div>
 
-            <ItineraryBuilder 
-              trip={trip} 
-              onSaveSuccess={(updatedTrip) => setTrip(updatedTrip)} 
+            <ItineraryBuilder
+              trip={trip}
+              onSaveSuccess={(updatedTrip) => setTrip(updatedTrip)}
             />
           </div>
         )}
@@ -401,8 +392,8 @@ export const TripDetails: React.FC = () => {
               <h3 className="font-bold text-slate-800 text-sm">Visual Travel Timeline</h3>
               <p className="text-xs text-slate-400 mt-1">Detailed daily sequence order of stops, hotel check-ins, and tours.</p>
             </div>
-            <Timeline 
-              trip={trip} 
+            <Timeline
+              trip={trip}
               onAddActivityTrigger={() => setIsActivityDiscoveryOpen(true)}
               onAddStopTrigger={() => setIsCityDiscoveryOpen(true)}
             />
