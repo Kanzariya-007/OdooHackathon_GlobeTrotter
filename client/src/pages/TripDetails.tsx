@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft, Edit2, Share2, Calendar, MapPin, 
   DollarSign, Activity, ListOrdered, PiggyBank, Copy, Check, Compass,
-  Trash2, AlertCircle, Sun, SunDim, Moon, ArrowDown, Plus
+  Trash2, AlertCircle, Plus
 } from 'lucide-react';
 import { getTrip, deleteTrip } from '../services/tripApi';
 import { Trip } from '../types/trip';
@@ -12,12 +12,11 @@ import { Modal } from '../components/ui/Modal';
 import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 import { EmptyState } from '../components/ui/EmptyState';
-<<<<<<< HEAD
 import { CityDiscoveryModal } from '../components/trips/CityDiscoveryModal';
 import { ActivityDiscoveryModal } from '../components/trips/ActivityDiscoveryModal';
-=======
 import { ItineraryBuilder } from '../components/trips/ItineraryBuilder';
->>>>>>> 60b91608361072699090af97d67fdb4041dcdd2f
+import { Timeline } from '../components/trips/Timeline';
+import { BudgetDashboard } from '../components/trips/BudgetDashboard';
 
 export const TripDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -347,339 +346,66 @@ export const TripDetails: React.FC = () => {
 
         {/* ---- ITINERARY ---- */}
         {activeTab === 'itinerary' && (
-          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs animate-in fade-in duration-200">
-<<<<<<< HEAD
-            <div className="border-b border-slate-100 pb-4 mb-5 flex justify-between items-center">
+          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs animate-in fade-in duration-200 flex flex-col gap-4">
+            <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
               <div>
-                <h3 className="font-bold text-slate-800 text-sm">Trip Itinerary</h3>
-                <p className="text-xs text-slate-400 mt-1">Day-by-day scheduled activities and locations for your journey.</p>
+                <h3 className="font-bold text-slate-800 text-sm">Itinerary Builder</h3>
+                <p className="text-xs text-slate-400 mt-1">Create day-by-day stops, discover local activities, and build your schedule.</p>
               </div>
-              {trip.destinations && trip.destinations.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
                 <Button
-                  variant="primary"
+                  variant="outline"
                   size="sm"
-                  onClick={() => setIsActivityDiscoveryOpen(true)}
-                  leftIcon={<Plus size={14} />}
-                  className="font-semibold text-xs py-2 px-3"
+                  onClick={() => setIsCityDiscoveryOpen(true)}
+                  leftIcon={<Plus size={12} />}
+                  className="text-xs font-bold"
                 >
-                  Schedule Activity
+                  Discover Cities
                 </Button>
-              )}
-            </div>
-            
-            {!trip.activities || trip.activities.length === 0 ? (
-              <EmptyState
-                title="No scheduled activities yet"
-                description={
-                  trip.destinations && trip.destinations.length > 0 
-                    ? "Activities planned in the stops will be scheduled here to construct your day-to-day agenda."
-                    : "Please add at least one city stop under the Overview tab before scheduling activities."
-                }
-                icon={<Activity size={32} />}
-                action={
-                  trip.destinations && trip.destinations.length > 0 ? (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => setIsActivityDiscoveryOpen(true)}
-                      leftIcon={<Plus size={14} />}
-                      className="font-semibold"
-                    >
-                      Schedule Activity
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => setIsCityDiscoveryOpen(true)}
-                      leftIcon={<Plus size={14} />}
-                      className="font-semibold"
-                    >
-                      Add City Stop
-                    </Button>
-                  )
-                }
-              />
-            ) : (
-              <div className="flex flex-col gap-6">
-                {getTripDays().map((dayDate, index) => {
-                  const dateStr = getLocalDateString(dayDate);
-                  const dayActivities = (trip.activities || []).filter(act => act.date === dateStr);
-                  
-                  return (
-                    <div key={dateStr} className="border border-slate-100 rounded-xl overflow-hidden shadow-xs">
-                      {/* Day Header */}
-                      <div className="bg-slate-50 border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-                        <div className="text-left">
-                          <span className="text-xs font-bold text-indigo-600 uppercase tracking-wide">Day {index + 1}</span>
-                          <h4 className="font-bold text-sm text-slate-800 mt-0.5">{formatDayDate(dayDate)}</h4>
-                        </div>
-                        <span className="text-xs font-semibold text-slate-400">
-                          {dayActivities.length} {dayActivities.length === 1 ? 'activity' : 'activities'}
-                        </span>
-                      </div>
-
-                      {/* Day Activities List */}
-                      <div className="p-4 flex flex-col gap-3">
-                        {dayActivities.length === 0 ? (
-                          <p className="text-xs text-slate-400 italic text-left py-2">No activities scheduled for this day. Rest or explore at your own pace!</p>
-                        ) : (
-                          dayActivities.map((act) => (
-                            <div key={act.id} className="border border-slate-50 rounded-lg p-3 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
-                              <div className="flex items-start gap-3">
-                                {/* Bullet category indicator */}
-                                <div className="mt-0.5 w-2 h-2 rounded-full bg-indigo-600 flex-shrink-0" />
-                                <div>
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <h5 className="font-bold text-xs text-slate-800">{act.name}</h5>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">
-                                      {act.category}
-                                    </span>
-                                  </div>
-                                  
-                                  {act.location && (
-                                    <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
-                                      <MapPin size={12} className="text-slate-400" />
-                                      <span>{act.location}</span>
-                                    </div>
-                                  )}
-                                  
-                                  {act.description && (
-                                    <p className="text-[11px] text-slate-500 mt-1 leading-normal">{act.description}</p>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 self-start sm:self-auto sm:text-right pl-5 sm:pl-0">
-                                {act.startTime && (
-                                  <span className="font-semibold text-slate-600">
-                                    ⏱️ {act.startTime} {act.endTime ? ` - ${act.endTime}` : ''}
-                                  </span>
-                                )}
-                                {act.duration && (
-                                  <span className="text-[11px] text-slate-400">({act.duration})</span>
-                                )}
-                                <span className="font-bold text-slate-700 text-sm">₹{act.cost.toLocaleString('en-IN')}</span>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                {trip.destinations && trip.destinations.length > 0 && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setIsActivityDiscoveryOpen(true)}
+                    leftIcon={<Plus size={12} />}
+                    className="text-xs font-bold"
+                  >
+                    Discover & Schedule Activities
+                  </Button>
+                )}
               </div>
-            )}
-=======
+            </div>
+
             <ItineraryBuilder 
               trip={trip} 
               onSaveSuccess={(updatedTrip) => setTrip(updatedTrip)} 
             />
->>>>>>> 60b91608361072699090af97d67fdb4041dcdd2f
           </div>
         )}
 
         {/* Budget Tab */}
         {activeTab === 'budget' && (
           <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs animate-in fade-in duration-200">
-            <div className="border-b border-slate-100 pb-4 mb-5">
+            <div className="border-b border-slate-100 pb-4 mb-5 text-left">
               <h3 className="font-bold text-slate-800 text-sm">Budget Analysis Dashboard</h3>
               <p className="text-xs text-slate-400 mt-1">Allocation graphs, average expenses, and cushion monitoring.</p>
             </div>
-
-            {!trip.budget || totalBudgetVal === 0 ? (
-              <EmptyState
-                title="No budget data available"
-                description="You haven't configured a budget for this trip. Edit the trip to set your target budget."
-                icon={<PiggyBank size={32} />}
-              />
-            ) : (
-              <div>
-                {/* Total Budget Card */}
-                <div className="bg-slate-50 border border-slate-100 rounded-xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Estimated Budget</span>
-                    <h4 className="text-2xl font-extrabold text-slate-900 mt-1">₹{totalBudgetVal.toLocaleString('en-IN')}</h4>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-2.5 min-w-[120px]">
-                      <span className="text-[9px] font-semibold text-indigo-400 uppercase">Allocated</span>
-                      <p className="text-sm font-bold text-indigo-700 mt-0.5">₹{budgetSum.toLocaleString('en-IN')}</p>
-                    </div>
-                    <div className={`${totalBudgetVal - budgetSum >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'} border rounded-lg p-2.5 min-w-[120px]`}>
-                      <span className={`text-[9px] font-semibold ${totalBudgetVal - budgetSum >= 0 ? 'text-emerald-400' : 'text-red-400'} uppercase`}>Remaining</span>
-                      <p className={`text-sm font-bold ${totalBudgetVal - budgetSum >= 0 ? 'text-emerald-700' : 'text-red-700'} mt-0.5`}>
-                        ₹{(totalBudgetVal - budgetSum).toLocaleString('en-IN')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress bar categories */}
-                <div className="flex flex-col gap-4 text-left mb-6">
-                  <h4 className="font-bold text-xs text-slate-400 uppercase tracking-widest">Category Allocation Breakdown</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      { name: 'Transport', val: transportVal, barColor: 'bg-indigo-600' },
-                      { name: 'Accommodation', val: accommodationVal, barColor: 'bg-teal-600' },
-                      { name: 'Food', val: foodVal, barColor: 'bg-rose-600' },
-                      { name: 'Activities', val: activitiesVal, barColor: 'bg-amber-600' },
-                      { name: 'Other', val: otherVal, barColor: 'bg-slate-500' }
-                    ].map((category) => {
-                      const pct = totalBudgetVal > 0 ? (category.val / totalBudgetVal) * 100 : 0;
-                      return (
-                        <div key={category.name} className="border border-slate-100 rounded-xl p-4 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs font-bold text-slate-800">{category.name}</span>
-                            <span className="text-xs font-semibold text-slate-500">
-                              ₹{category.val.toLocaleString('en-IN')} ({pct.toFixed(1)}%)
-                            </span>
-                          </div>
-                          
-                          {/* Visual percentage tracker bar */}
-                          <div className="h-2.5 w-full bg-slate-200/70 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full ${category.barColor} transition-all duration-500`} 
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Overall Allocation Gauge */}
-                <div className="border border-slate-100 rounded-xl p-4 bg-slate-50/30 text-left">
-                  <div className="flex justify-between items-center mb-2 text-xs">
-                    <span className="font-semibold text-slate-500">Overall Budget Allocation</span>
-                    <span className={`font-bold ${budgetSum <= totalBudgetVal ? 'text-indigo-600' : 'text-red-500'}`}>
-                      {((budgetSum / totalBudgetVal) * 100).toFixed(1)}% Allocated
-                    </span>
-                  </div>
-                  <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full ${budgetSum <= totalBudgetVal ? 'bg-indigo-600' : 'bg-red-500'} transition-all duration-500`}
-                      style={{ width: `${Math.min((budgetSum / totalBudgetVal) * 100, 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-slate-400 mt-2">
-                    {budgetSum <= totalBudgetVal 
-                      ? "🟢 Your allocated expenses are currently within the target budget limit."
-                      : "⚠️ Your allocated expenses exceed the estimated target budget limit."
-                    }
-                  </p>
-                </div>
-              </div>
-            )}
+            <BudgetDashboard trip={trip} />
           </div>
         )}
 
         {/* Timeline Tab */}
         {activeTab === 'timeline' && (
           <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs animate-in fade-in duration-200">
-            <div className="border-b border-slate-100 pb-4 mb-6">
+            <div className="border-b border-slate-100 pb-4 mb-6 text-left">
               <h3 className="font-bold text-slate-800 text-sm">Visual Travel Timeline</h3>
               <p className="text-xs text-slate-400 mt-1">Detailed daily sequence order of stops, hotel check-ins, and tours.</p>
             </div>
-
-            {!trip.activities || trip.activities.length === 0 ? (
-              <EmptyState
-                title="No timeline events configured"
-                description="Activities scheduled in the itinerary builder will be dynamically mapped to your visual timeline."
-                icon={<Calendar size={32} />}
-              />
-            ) : (
-              <div className="flex flex-col gap-8">
-                {getTripDays().map((dayDate, index) => {
-                  const dateStr = getLocalDateString(dayDate);
-                  const dayActivities = (trip.activities || []).filter(act => act.date === dateStr);
-                  
-                  const morningItems = dayActivities.filter(a => {
-                    const h = getHour(a.startTime);
-                    return h >= 0 && h < 12;
-                  });
-                  const afternoonItems = dayActivities.filter(a => {
-                    const h = getHour(a.startTime);
-                    return h >= 12 && h < 17;
-                  });
-                  const eveningItems = dayActivities.filter(a => {
-                    const h = getHour(a.startTime);
-                    return h >= 17;
-                  });
-                  const unscheduledItems = dayActivities.filter(a => {
-                    const h = getHour(a.startTime);
-                    return h === -1;
-                  });
-
-                  const slots = [
-                    { title: 'Morning', icon: <Sun className="text-amber-500 flex-shrink-0" size={16} />, items: morningItems },
-                    { title: 'Afternoon', icon: <SunDim className="text-orange-500 flex-shrink-0" size={16} />, items: afternoonItems },
-                    { title: 'Evening', icon: <Moon className="text-indigo-400 flex-shrink-0" size={16} />, items: eveningItems },
-                    { title: 'Scheduled', icon: <Calendar className="text-slate-400 flex-shrink-0" size={16} />, items: unscheduledItems }
-                  ].filter(s => s.items.length > 0);
-
-                  return (
-                    <div key={dateStr} className="flex flex-col gap-3">
-                      {/* Day Title Node */}
-                      <div className="flex flex-col items-center">
-                        <div className="bg-indigo-600 text-white font-extrabold text-xs px-4 py-1.5 rounded-full shadow-md shadow-indigo-150">
-                          Day {index + 1}
-                        </div>
-                        <p className="text-[11px] font-semibold text-slate-400 mt-1">{formatDayDate(dayDate)}</p>
-                      </div>
-
-                      {slots.length === 0 ? (
-                        <div className="flex flex-col items-center">
-                          <ArrowDown size={14} className="text-slate-300 my-1" />
-                          <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 flex items-center gap-2 max-w-sm">
-                            <Compass size={14} className="text-slate-400" />
-                            <span className="text-xs text-slate-500 font-medium">Rest Day — Relax and explore</span>
-                          </div>
-                        </div>
-                      ) : (
-                        slots.map((slot) => (
-                          <React.Fragment key={slot.title}>
-                            {/* Down Arrow separator before each slot */}
-                            <div className="flex flex-col items-center animate-in fade-in duration-200">
-                              <ArrowDown size={14} className="text-indigo-400 my-1" />
-                            </div>
-
-                            {/* Slot Node */}
-                            <div className="flex flex-col items-center max-w-md w-full mx-auto animate-in fade-in zoom-in-95 duration-200">
-                              <div className="bg-white border border-slate-100 rounded-xl shadow-xs p-3.5 w-full hover:border-slate-200 transition-colors text-left flex items-start gap-3">
-                                <div className="p-2 bg-slate-50 rounded-lg">
-                                  {slot.icon}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{slot.title}</span>
-                                  <div className="flex flex-col gap-2.5 mt-1.5">
-                                    {slot.items.map(act => (
-                                      <div key={act.id} className="border-l-2 border-indigo-500 pl-2.5 text-left">
-                                        <h5 className="font-bold text-xs text-slate-800 line-clamp-1">{act.name}</h5>
-                                        <div className="flex flex-wrap items-center gap-2 mt-0.5 text-[10px] text-slate-400 font-medium">
-                                          {act.startTime && (
-                                            <span>⏱️ {act.startTime} {act.endTime ? ` - ${act.endTime}` : ''}</span>
-                                          )}
-                                          {act.location && (
-                                            <span>📍 {act.location}</span>
-                                          )}
-                                          <span className="text-slate-500 font-bold">₹{act.cost.toLocaleString('en-IN')}</span>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </React.Fragment>
-                        ))
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <Timeline 
+              trip={trip} 
+              onAddActivityTrigger={() => setIsActivityDiscoveryOpen(true)}
+              onAddStopTrigger={() => setIsCityDiscoveryOpen(true)}
+            />
           </div>
         )}
 
