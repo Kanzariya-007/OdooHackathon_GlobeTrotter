@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Compass, Mail, Lock, User as UserIcon, AlertCircle } from 'lucide-react';
-import { register } from '../services/tripApi';
+import { useAuth } from '../hooks/useAuth';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 
@@ -11,6 +11,7 @@ interface SignupProps {
 
 export const Signup: React.FC<SignupProps> = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +60,7 @@ export const Signup: React.FC<SignupProps> = ({ onLoginSuccess }) => {
     setErrors({});
 
     try {
-      const user = await register(name, email, password);
+      const user = await signup(name, email, password);
       onLoginSuccess(user);
       navigate('/dashboard');
     } catch (err: any) {

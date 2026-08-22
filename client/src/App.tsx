@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { getMe } from './services/tripApi';
-import { User } from './types/trip';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Components & Layout
 import { Navbar } from './components/layout/Navbar';
@@ -18,12 +17,9 @@ import { TripDetails } from './pages/TripDetails';
 import { PublicTrip } from './pages/PublicTrip';
 
 // Protected Routes Guard
-interface ProtectedRouteProps {
-  user: User | null;
-  loading: boolean;
-}
+const ProtectedRoute: React.FC = () => {
+  const { currentUser, loading } = useAuth();
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ user, loading }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
@@ -35,21 +31,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ user, loading }) => {
       </div>
     );
   }
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  return currentUser ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 // Main Layout Wrapper
-interface AppLayoutProps {
-  user: User | null;
-}
-
-const AppLayout: React.FC<AppLayoutProps> = ({ user }) => {
+const AppLayout: React.FC = () => {
+  const { currentUser } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top Navigation */}
-      <Navbar userName={user?.name} onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
+      <Navbar userName={currentUser?.name} onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
       
       {/* Sidebar + Core Content Frame */}
       <div className="flex-1 flex relative">
@@ -63,28 +56,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ user }) => {
   );
 };
 
-export default function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+function AppContent() {
+  const { currentUser, checkAuth } = useAuth();
 
-  const checkAuth = async () => {
-    setLoading(true);
-    try {
-      const activeUser = await getMe();
-      setUser(activeUser);
-    } catch {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const handleLoginSuccess = (loggedInUser: User) => {
-    setUser(loggedInUser);
+  const handleLoginSuccess = async () => {
+    await checkAuth();
   };
 
   return (
@@ -97,16 +73,16 @@ export default function App() {
         {/* Guest Authentication Routes */}
         <Route 
           path="/login" 
-          element={user ? <Navigate to="/dashboard" replace /> : <Login onLoginSuccess={handleLoginSuccess} />} 
+          element={currentUser ? <Navigate to="/dashboard" replace /> : <Login onLoginSuccess={handleLoginSuccess} />} 
         />
         <Route 
           path="/signup" 
-          element={user ? <Navigate to="/dashboard" replace /> : <Signup onLoginSuccess={handleLoginSuccess} />} 
+          element={currentUser ? <Navigate to="/dashboard" replace /> : <Signup onLoginSuccess={handleLoginSuccess} />} 
         />
 
         {/* Private Application Dashboard (Auth Guarded) */}
-        <Route element={<ProtectedRoute user={user} loading={loading} />}>
-          <Route element={<AppLayout user={user} />}>
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/trips" element={<MyTrips />} />
             <Route path="/trips/create" element={<CreateTrip />} />
@@ -121,5 +97,13 @@ export default function App() {
 
       </Routes>
     </BrowserRouter>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
