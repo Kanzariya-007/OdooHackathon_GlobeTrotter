@@ -25,26 +25,26 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete }) => {
   // Safe fallback cover image
   const defaultCover = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80';
   const coverUrl = trip.coverImage && trip.coverImage.trim() !== '' ? trip.coverImage : defaultCover;
-  
+
   // Safe budget check
   const estimatedBudget = trip.budget?.totalBudget ?? 0;
   const destinationsCount = trip.destinations?.length ?? 0;
 
   return (
     <div className="bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col h-full group">
-      
+
       {/* Cover Image Banner */}
       <div className="relative h-44 overflow-hidden bg-slate-100">
-        <img 
-          src={coverUrl} 
-          alt={trip.name} 
+        <img
+          src={coverUrl}
+          alt={trip.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           onError={(e) => {
             (e.target as HTMLImageElement).src = defaultCover;
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-60" />
-        
+
         {/* Float Badge: Days Count */}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] font-bold text-slate-800 px-2 py-1 rounded-md shadow-sm">
           {Math.ceil((new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} Days
@@ -68,7 +68,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete }) => {
                 {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
               </span>
             </div>
-            
+
             <div className="flex items-center gap-1.5">
               <MapPin size={13} className="text-slate-400 flex-shrink-0" />
               <span>{destinationsCount} {destinationsCount === 1 ? 'destination' : 'destinations'}</span>
