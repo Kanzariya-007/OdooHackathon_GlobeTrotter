@@ -354,7 +354,18 @@ export const getTrips = async (): Promise<Trip[]> => {
 
 export const getTrip = async (id: string): Promise<Trip> => {
   try {
-    const res = await api.get(`/trips/${id}`);
+    const token = localStorage.getItem('globetrotter_token');
+    let res;
+    if (token) {
+      try {
+        res = await api.get(`/trips/${id}`);
+      } catch (err) {
+        // Fallback to public route if owner check failed (e.g. viewing shared trip from another user)
+        res = await api.get(`/trips/public/${id}`);
+      }
+    } else {
+      res = await api.get(`/trips/public/${id}`);
+    }
     return res.data;
   } catch (error) {
     console.warn(`[API] Real API getTrip(${id}) failed, fetching from mock data`, error);

@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { prisma } from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 
@@ -7,6 +7,61 @@ import { AuthenticatedRequest } from '../middleware/auth.middleware';
  */
 const mapTripResponse = (trip: any) => {
   if (!trip) return null;
+
+  // Map PostgreSQL relational tables to frontend expectations
+  const destinations = trip.tripStops 
+    ? trip.tripStops.map((ts: any) => ({
+        id: ts.id,
+        city: ts.city.name,
+        country: ts.city.country,
+        region: ts.city.region || 'Europe',
+        costIndex: 3,
+        image: '',
+        description: ''
+      })) 
+    : [];
+
+  const tripStops = trip.tripStops 
+    ? trip.tripStops.map((ts: any) => ({
+        id: ts.id,
+        city: ts.city.name,
+        country: ts.city.country,
+        startDate: ts.arrivalDate ? ts.arrivalDate.toISOString().split('T')[0] : '',
+        endDate: ts.departureDate ? ts.departureDate.toISOString().split('T')[0] : '',
+        order: ts.order
+      })) 
+    : [];
+
+  const activities = trip.tripStops 
+    ? trip.tripStops.flatMap((ts: any) => 
+        ts.stopActivities 
+          ? ts.stopActivities.map((sa: any) => ({
+              id: sa.activity.id,
+              name: sa.activity.name,
+              category: sa.activity.category || 'Activities',
+              duration: sa.activity.duration ? `${sa.activity.duration} mins` : undefined,
+              cost: Number(sa.activity.cost) || 0,
+              description: sa.activity.description || undefined,
+              startTime: sa.plannedTime ? sa.plannedTime.toISOString().split('T')[1].substring(0, 5) : undefined,
+              endTime: undefined,
+              date: sa.plannedTime ? sa.plannedTime.toISOString().split('T')[0] : undefined,
+              location: sa.activity.location || undefined,
+              tripStopId: ts.id,
+              order: sa.order
+            })) 
+          : []
+      ) 
+    : [];
+
+  const budget = {
+    totalBudget: 50000,
+    transport: activities.filter((a: any) => a.category === 'Transport').reduce((sum: number, a: any) => sum + a.cost, 0),
+    accommodation: activities.filter((a: any) => a.category === 'Accommodation').reduce((sum: number, a: any) => sum + a.cost, 0),
+    activities: activities.filter((a: any) => a.category === 'Activities').reduce((sum: number, a: any) => sum + a.cost, 0),
+    food: activities.filter((a: any) => a.category === 'Food').reduce((sum: number, a: any) => sum + a.cost, 0),
+    other: activities.filter((a: any) => a.category === 'Other').reduce((sum: number, a: any) => sum + a.cost, 0),
+  };
+
   return {
     id: trip.id,
     title: trip.title,
@@ -16,7 +71,11 @@ const mapTripResponse = (trip: any) => {
     endDate: trip.endDate.toISOString().split('T')[0],
     userId: trip.userId,
     createdAt: trip.createdAt,
-    updatedAt: trip.updatedAt
+    updatedAt: trip.updatedAt,
+    destinations,
+    tripStops,
+    activities,
+    budget
   };
 };
 
@@ -125,7 +184,19 @@ export const TripController = {
       }
 
       const trip = await prisma.trip.findUnique({
-        where: { id }
+        where: { id },
+        include: {
+          tripStops: {
+            include: {
+              city: true,
+              stopActivities: {
+                include: {
+                  activity: true
+                }
+              }
+            }
+          }
+        }
       });
 
       // Secure handling: Return 404 if trip does not exist OR belongs to another user
@@ -255,6 +326,42 @@ export const TripController = {
     } catch (error) {
       console.error('[Delete Trip Error]:', error);
       res.status(500).json({ success: false, message: 'Server error deleting trip' });
+    }
+  },
+
+  /**
+   * GET /api/trips/public/:id
+   * Retrieves a single public trip by ID (unauthenticated)
+   */
+  getPublicById: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      const trip = await prisma.trip.findUnique({
+        where: { id },
+        include: {
+          tripStops: {
+            include: {
+              city: true,
+              stopActivities: {
+                include: {
+                  activity: true
+                }
+              }
+            }
+          }
+        }
+      });
+
+      if (!trip) {
+        res.status(404).json({ success: false, message: 'Trip not found' });
+        return;
+      }
+
+      res.status(200).json(mapTripResponse(trip));
+    } catch (error) {
+      console.error('[Get Public Trip Error]:', error);
+      res.status(500).json({ success: false, message: 'Server error retrieving public trip details' });
     }
   }
 };

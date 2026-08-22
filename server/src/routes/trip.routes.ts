@@ -4,7 +4,10 @@ import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Apply authentication middleware to all trip endpoints
+// Public route - does not require authentication
+router.get('/public/:id', TripController.getPublicById);
+
+// Apply authentication middleware to all other trip endpoints
 router.use(authMiddleware as any);
 
 router.post('/', TripController.create);

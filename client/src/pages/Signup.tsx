@@ -63,7 +63,8 @@ export const Signup: React.FC<SignupProps> = ({ onLoginSuccess }) => {
     try {
       const user = await signup(name, email, password);
       onLoginSuccess(user);
-      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      const pendingCopy = localStorage.getItem('pending_copy_trip_id');
+      const from = pendingCopy ? `/share/${pendingCopy}` : ((location.state as any)?.from?.pathname || '/dashboard');
       navigate(from, { replace: true });
     } catch (err: any) {
       setErrors({ form: err.message || 'Registration failed. Please try again.' });
