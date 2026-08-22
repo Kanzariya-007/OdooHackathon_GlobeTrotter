@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Briefcase, CalendarCheck, Landmark, Compass, DollarSign } from 'lucide-react';
-import { getTrips, getPopularDestinations } from '../services/tripApi';
+import { Plus, Briefcase, CalendarCheck, Landmark, Compass, DollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { getTrips, getPopularDestinations, deleteTrip } from '../services/tripApi';
 import { Trip, Destination } from '../types/trip';
 import { Button } from '../components/ui/Button';
 import { TripCard } from '../components/trips/TripCard';
+import { Modal } from '../components/ui/Modal';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,13 @@ export const Dashboard: React.FC = () => {
   const [popularDests, setPopularDests] = useState<Destination[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Deletion Modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [tripToDelete, setTripToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -33,6 +41,43 @@ export const Dashboard: React.FC = () => {
     
     loadDashboardData();
   }, []);
+
+  const showSuccess = (msg: string) => {
+    setSuccessMsg(msg);
+    setTimeout(() => setSuccessMsg(null), 3500);
+  };
+
+  const handleDeleteTrigger = (id: string) => {
+    setTripToDelete(id);
+    setDeleteError(null);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteCancel = () => {
+    if (isDeleting) return;
+    setDeleteModalOpen(false);
+    setTripToDelete(null);
+    setDeleteError(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!tripToDelete || isDeleting) return;
+
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteTrip(tripToDelete);
+      setTrips(prev => prev.filter(t => t.id !== tripToDelete));
+      setDeleteModalOpen(false);
+      setTripToDelete(null);
+      showSuccess('Trip deleted successfully.');
+    } catch (err: any) {
+      console.error(err);
+      setDeleteError(err.message || 'Failed to delete trip. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Stats calculation
   const totalTripsCount = trips.length;
@@ -58,10 +103,6 @@ export const Dashboard: React.FC = () => {
   const recentTrips = [...trips]
     .slice(0, 2);
 
-  const handleTripDeleteSuccess = (deletedId: string) => {
-    setTrips(prev => prev.filter(t => t.id !== deletedId));
-  };
-
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -75,8 +116,16 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 text-left">
+    <div className="flex flex-col gap-6 text-left relative">
       
+      {/* Success Toast */}
+      {successMsg && (
+        <div className="fixed top-20 right-4 z-50 flex items-center gap-2.5 bg-emerald-600 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-in fade-in slide-in-from-top-2 duration-300">
+          <CheckCircle2 size={16} />
+          {successMsg}
+        </div>
+      )}
+
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="relative z-10 max-w-xl">
@@ -186,11 +235,7 @@ export const Dashboard: React.FC = () => {
                   <TripCard 
                     key={trip.id} 
                     trip={trip} 
-                    onDelete={(id) => {
-                      if (window.confirm("Are you sure you want to delete this trip?")) {
-                        handleTripDeleteSuccess(id);
-                      }
-                    }} 
+                    onDelete={handleDeleteTrigger} 
                   />
                 ))}
               </div>
@@ -265,6 +310,54 @@ export const Dashboard: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        title="Delete this trip?"
+        size="sm"
+        footer={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleDeleteCancel}
+              className="font-semibold"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              isLoading={isDeleting}
+              onClick={handleDeleteConfirm}
+              className="font-semibold"
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-slate-800 text-sm">This action cannot be undone.</p>
+              <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+                This will permanently delete the trip, including all destinations, activities, and budget plans.
+              </p>
+            </div>
+          </div>
+          {deleteError && (
+            <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-red-700 text-xs font-semibold flex items-center gap-2">
+              <AlertCircle size={14} />
+              {deleteError}
+            </div>
+          )}
+        </div>
+      </Modal>
 
     </div>
   );
