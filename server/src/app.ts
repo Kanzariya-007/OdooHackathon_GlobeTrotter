@@ -1,14 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import authRouter from './routes/auth.routes';
+import tripRouter from './routes/trip.routes';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Auth routes mounting
+// Mount routes
 app.use('/api/auth', authRouter);
+app.use('/api/trips', tripRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
