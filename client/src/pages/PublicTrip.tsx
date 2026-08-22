@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getTrip, createTrip } from '../services/tripApi';
+import { getTrip, createTrip, updateTrip } from '../services/tripApi';
 import { Trip } from '../types/trip';
-import { Compass, Calendar, MapPin, DollarSign, Copy, Check, ArrowRight } from 'lucide-react';
+import { Compass, Calendar, MapPin, Copy, Check, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export const PublicTrip: React.FC = () => {

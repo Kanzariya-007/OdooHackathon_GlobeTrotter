@@ -39,12 +39,8 @@ export const EditTrip: React.FC = () => {
     setIsUpdating(true);
     setError(null);
     try {
-      // Structure the budget properly if it gets updated or falls back
-      const updatedBudget = trip.budget 
-        ? {
-            ...trip.budget,
-            totalBudget: formData.totalBudget || trip.budget.totalBudget
-          }
+      const updatedBudget = trip.budget
+        ? { ...trip.budget, totalBudget: formData.totalBudget ?? trip.budget.totalBudget }
         : undefined;
 
       await updateTrip(id, {
@@ -53,10 +49,9 @@ export const EditTrip: React.FC = () => {
         endDate: formData.endDate,
         description: formData.description,
         coverImage: formData.coverImage,
-        budget: updatedBudget
+        ...(updatedBudget && { budget: updatedBudget }),
       });
 
-      // Redirect back to Trip Details
       navigate(`/trips/${id}`);
     } catch (err: any) {
       console.error(err);
@@ -73,17 +68,17 @@ export const EditTrip: React.FC = () => {
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
-        <p className="text-sm font-medium text-slate-500">Retrieving trip configuration...</p>
+        <p className="text-sm font-medium text-slate-500">Loading trip data...</p>
       </div>
     );
   }
 
-  if (error && !trip) {
+  if (!trip) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center gap-4">
-        <AlertCircle size={40} className="text-red-500" />
-        <h3 className="font-bold text-slate-800 text-base">Error Loading Trip</h3>
-        <p className="text-xs text-slate-400 leading-relaxed">{error}</p>
+        <AlertCircle size={40} className="text-red-400" />
+        <h3 className="font-bold text-slate-800 text-base">Trip Not Found</h3>
+        <p className="text-sm text-slate-400 leading-relaxed">{error || 'Could not find the trip you are trying to edit.'}</p>
         <Button variant="primary" size="sm" onClick={() => navigate('/trips')}>
           Back to My Trips
         </Button>
@@ -91,39 +86,36 @@ export const EditTrip: React.FC = () => {
     );
   }
 
-  // Pre-map fields to fit TripFormData props
-  const initialFormValues: Partial<TripFormData> = trip 
-    ? {
-        name: trip.name,
-        startDate: trip.startDate,
-        endDate: trip.endDate,
-        description: trip.description || '',
-        coverImage: trip.coverImage || '',
-        totalBudget: trip.budget?.totalBudget
-      }
-    : {};
+  const initialFormValues: Partial<TripFormData> = {
+    name: trip.name,
+    startDate: trip.startDate,
+    endDate: trip.endDate,
+    description: trip.description || '',
+    coverImage: trip.coverImage || '',
+    totalBudget: trip.budget?.totalBudget ?? 50000,
+  };
 
   return (
     <div className="flex flex-col gap-6 text-left max-w-3xl mx-auto">
       
-      {/* Header and Back Button */}
+      {/* Header */}
       <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => navigate(-1)}
-          className="p-2 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-lg flex items-center justify-center"
+          onClick={() => navigate(`/trips/${id}`)}
+          className="p-2 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0"
         >
           <ArrowLeft size={16} />
         </Button>
         <div>
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Edit Trip: {trip?.name}</h2>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">Modify the duration, name, or metadata of this travel itinerary.</p>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Edit Trip</h2>
+          <p className="text-xs text-slate-400 font-medium mt-0.5 truncate max-w-xs">{trip.name}</p>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs flex items-start gap-2.5">
+        <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 text-sm flex items-start gap-2.5">
           <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
           <span className="font-semibold">{error}</span>
         </div>
@@ -134,7 +126,8 @@ export const EditTrip: React.FC = () => {
         <TripForm
           initialData={initialFormValues}
           onSubmit={handleFormSubmit}
-          submitLabel="Update Itinerary"
+          onCancel={() => navigate(`/trips/${id}`)}
+          submitLabel="Save Changes"
           isLoading={isUpdating}
         />
       </div>
