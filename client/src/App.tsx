@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 
 // Components & Layout
 import { Navbar } from './components/layout/Navbar';
@@ -15,10 +16,14 @@ import { CreateTrip } from './pages/CreateTrip';
 import { EditTrip } from './pages/EditTrip';
 import { TripDetails } from './pages/TripDetails';
 import { PublicTrip } from './pages/PublicTrip';
+import { Itinerary } from './pages/Itinerary';
+import { Budget } from './pages/Budget';
+import { Settings } from './pages/Settings';
 
-// Protected Routes Guard
+// Protected Routes Guard with destination path preservation
 const ProtectedRoute: React.FC = () => {
   const { currentUser, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -31,7 +36,7 @@ const ProtectedRoute: React.FC = () => {
       </div>
     );
   }
-  return currentUser ? <Outlet /> : <Navigate to="/login" replace />;
+  return currentUser ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 // Main Layout Wrapper
@@ -84,10 +89,22 @@ function AppContent() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* Trip management paths & aliases */}
             <Route path="/trips" element={<MyTrips />} />
+            <Route path="/my-trips" element={<Navigate to="/trips" replace />} />
+            
             <Route path="/trips/create" element={<CreateTrip />} />
+            <Route path="/create-trip" element={<Navigate to="/trips/create" replace />} />
+            
             <Route path="/trips/:id" element={<TripDetails />} />
+            <Route path="/trip/:id" element={<TripDetails />} />
             <Route path="/trips/:id/edit" element={<EditTrip />} />
+
+            {/* Other layout segments */}
+            <Route path="/itinerary" element={<Itinerary />} />
+            <Route path="/budget" element={<Budget />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>
 
@@ -103,7 +120,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
     </AuthProvider>
   );
 }

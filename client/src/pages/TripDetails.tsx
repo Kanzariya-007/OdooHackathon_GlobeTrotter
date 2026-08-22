@@ -12,8 +12,12 @@ import { Modal } from '../components/ui/Modal';
 import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 import { EmptyState } from '../components/ui/EmptyState';
+<<<<<<< HEAD
 import { CityDiscoveryModal } from '../components/trips/CityDiscoveryModal';
 import { ActivityDiscoveryModal } from '../components/trips/ActivityDiscoveryModal';
+=======
+import { ItineraryBuilder } from '../components/trips/ItineraryBuilder';
+>>>>>>> 60b91608361072699090af97d67fdb4041dcdd2f
 
 export const TripDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -341,9 +345,10 @@ export const TripDetails: React.FC = () => {
           </div>
         )}
 
-        {/* Itinerary Tab */}
+        {/* ---- ITINERARY ---- */}
         {activeTab === 'itinerary' && (
           <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs animate-in fade-in duration-200">
+<<<<<<< HEAD
             <div className="border-b border-slate-100 pb-4 mb-5 flex justify-between items-center">
               <div>
                 <h3 className="font-bold text-slate-800 text-sm">Trip Itinerary</h3>
@@ -465,6 +470,12 @@ export const TripDetails: React.FC = () => {
                 })}
               </div>
             )}
+=======
+            <ItineraryBuilder 
+              trip={trip} 
+              onSaveSuccess={(updatedTrip) => setTrip(updatedTrip)} 
+            />
+>>>>>>> 60b91608361072699090af97d67fdb4041dcdd2f
           </div>
         )}
 

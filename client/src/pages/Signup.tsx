@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Compass, Mail, Lock, User as UserIcon, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Input } from '../components/ui/Input';
@@ -11,6 +11,7 @@ interface SignupProps {
 
 export const Signup: React.FC<SignupProps> = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signup } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -62,7 +63,8 @@ export const Signup: React.FC<SignupProps> = ({ onLoginSuccess }) => {
     try {
       const user = await signup(name, email, password);
       onLoginSuccess(user);
-      navigate('/dashboard');
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
     } catch (err: any) {
       setErrors({ form: err.message || 'Registration failed. Please try again.' });
     } finally {

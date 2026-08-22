@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Map, PlusCircle, X } from 'lucide-react';
+import { LayoutDashboard, Map, PlusCircle, Calendar, DollarSign, Settings, X } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,6 +12,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={18} /> },
     { name: 'My Trips', path: '/trips', icon: <Map size={18} /> },
     { name: 'Create Trip', path: '/trips/create', icon: <PlusCircle size={18} /> },
+    { name: 'Itinerary', path: '/itinerary', icon: <Calendar size={18} /> },
+    { name: 'Budget', path: '/budget', icon: <DollarSign size={18} /> },
+    { name: 'Settings', path: '/settings', icon: <Settings size={18} /> },
   ];
 
   const activeStyle = "flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-lg bg-indigo-50 text-indigo-700 transition-colors";
