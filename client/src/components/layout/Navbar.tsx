@@ -1,7 +1,7 @@
 import React from 'react';
 import { Compass, Menu, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../../services/tripApi';
+import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/Button';
 
 interface NavbarProps {
@@ -11,6 +11,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ userName = 'Traveler', onToggleSidebar }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
