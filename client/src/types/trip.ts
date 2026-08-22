@@ -27,6 +27,8 @@ export interface Activity {
   endTime?: string; // e.g. "12:00"
   date?: string; // e.g. "2026-09-10"
   location?: string;
+  tripStopId?: string; // Links activity to a specific TripStop (city stop)
+  order?: number; // Custom order index within a stop
 }
 
 export interface Budget {
@@ -49,6 +51,15 @@ export interface TimelineItem {
   category?: 'Transport' | 'Accommodation' | 'Activities' | 'Food' | 'Other';
 }
 
+export interface TripStop {
+  id: string;
+  city: string;
+  country: string;
+  startDate: string; // "YYYY-MM-DD"
+  endDate: string; // "YYYY-MM-DD"
+  order: number;
+}
+
 export interface Trip {
   id: string;
   name: string;
@@ -58,6 +69,7 @@ export interface Trip {
   coverImage?: string;
   destinations: Destination[];
   activities: Activity[];
+  tripStops?: TripStop[]; // Sequence of city stops
   budget?: Budget;
   userId: string;
   createdAt?: string;

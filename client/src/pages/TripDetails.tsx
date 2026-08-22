@@ -12,6 +12,7 @@ import { Modal } from '../components/ui/Modal';
 import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 import { EmptyState } from '../components/ui/EmptyState';
+import { ItineraryBuilder } from '../components/trips/ItineraryBuilder';
 
 export const TripDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -324,90 +325,13 @@ export const TripDetails: React.FC = () => {
           </div>
         )}
 
-        {/* Itinerary Tab */}
+        {/* ---- ITINERARY ---- */}
         {activeTab === 'itinerary' && (
           <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs animate-in fade-in duration-200">
-            <div className="border-b border-slate-100 pb-4 mb-5">
-              <h3 className="font-bold text-slate-800 text-sm">Trip Itinerary</h3>
-              <p className="text-xs text-slate-400 mt-1">Day-by-day scheduled activities and locations for your journey.</p>
-            </div>
-            
-            {!trip.activities || trip.activities.length === 0 ? (
-              <EmptyState
-                title="No scheduled activities yet"
-                description="Activities planned in the stops will be scheduled here to construct your day-to-day agenda."
-                icon={<Activity size={32} />}
-              />
-            ) : (
-              <div className="flex flex-col gap-6">
-                {getTripDays().map((dayDate, index) => {
-                  const dateStr = getLocalDateString(dayDate);
-                  const dayActivities = (trip.activities || []).filter(act => act.date === dateStr);
-                  
-                  return (
-                    <div key={dateStr} className="border border-slate-100 rounded-xl overflow-hidden shadow-xs">
-                      {/* Day Header */}
-                      <div className="bg-slate-50 border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-                        <div className="text-left">
-                          <span className="text-xs font-bold text-indigo-600 uppercase tracking-wide">Day {index + 1}</span>
-                          <h4 className="font-bold text-sm text-slate-800 mt-0.5">{formatDayDate(dayDate)}</h4>
-                        </div>
-                        <span className="text-xs font-semibold text-slate-400">
-                          {dayActivities.length} {dayActivities.length === 1 ? 'activity' : 'activities'}
-                        </span>
-                      </div>
-
-                      {/* Day Activities List */}
-                      <div className="p-4 flex flex-col gap-3">
-                        {dayActivities.length === 0 ? (
-                          <p className="text-xs text-slate-400 italic text-left py-2">No activities scheduled for this day. Rest or explore at your own pace!</p>
-                        ) : (
-                          dayActivities.map((act) => (
-                            <div key={act.id} className="border border-slate-50 rounded-lg p-3 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
-                              <div className="flex items-start gap-3">
-                                {/* Bullet category indicator */}
-                                <div className="mt-0.5 w-2 h-2 rounded-full bg-indigo-600 flex-shrink-0" />
-                                <div>
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <h5 className="font-bold text-xs text-slate-800">{act.name}</h5>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">
-                                      {act.category}
-                                    </span>
-                                  </div>
-                                  
-                                  {act.location && (
-                                    <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
-                                      <MapPin size={12} className="text-slate-400" />
-                                      <span>{act.location}</span>
-                                    </div>
-                                  )}
-                                  
-                                  {act.description && (
-                                    <p className="text-[11px] text-slate-500 mt-1 leading-normal">{act.description}</p>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 self-start sm:self-auto sm:text-right pl-5 sm:pl-0">
-                                {act.startTime && (
-                                  <span className="font-semibold text-slate-600">
-                                    ⏱️ {act.startTime} {act.endTime ? ` - ${act.endTime}` : ''}
-                                  </span>
-                                )}
-                                {act.duration && (
-                                  <span className="text-[11px] text-slate-400">({act.duration})</span>
-                                )}
-                                <span className="font-bold text-slate-700 text-sm">₹{act.cost.toLocaleString('en-IN')}</span>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <ItineraryBuilder 
+              trip={trip} 
+              onSaveSuccess={(updatedTrip) => setTrip(updatedTrip)} 
+            />
           </div>
         )}
 
