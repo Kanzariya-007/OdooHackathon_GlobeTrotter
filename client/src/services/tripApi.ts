@@ -453,3 +453,171 @@ export const deleteTrip = async (id: string): Promise<boolean> => {
 export const getPopularDestinations = async (): Promise<Destination[]> => {
   return POPULAR_DESTINATIONS;
 };
+
+// ==========================================
+// CITIES & ACTIVITIES DISCOVERY DATA
+// ==========================================
+
+const DISCOVERABLE_CITIES: Destination[] = [
+  ...POPULAR_DESTINATIONS,
+  {
+    id: 'dest-6',
+    city: 'London',
+    country: 'United Kingdom',
+    region: 'Europe',
+    costIndex: 4,
+    popularity: 'Very High',
+    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80',
+    description: 'A historic capital featuring Big Ben, the Tower of London, and world-class West End shows.'
+  },
+  {
+    id: 'dest-7',
+    city: 'Sydney',
+    country: 'Australia',
+    region: 'Oceania',
+    costIndex: 4,
+    popularity: 'High',
+    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=600&q=80',
+    description: 'An iconic harbor city famed for its Opera House, surf beaches, and sunny climate.'
+  },
+  {
+    id: 'dest-8',
+    city: 'Cape Town',
+    country: 'South Africa',
+    region: 'Africa',
+    costIndex: 2,
+    popularity: 'High',
+    image: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=600&q=80',
+    description: 'A stunning coastal city situated beneath the majestic Table Mountain.'
+  },
+  {
+    id: 'dest-9',
+    city: 'Cairo',
+    country: 'Egypt',
+    region: 'Middle East',
+    costIndex: 1,
+    popularity: 'Medium',
+    image: 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&w=600&q=80',
+    description: 'Home of the ancient Giza Pyramid Complex and the historic Nile River.'
+  },
+  {
+    id: 'dest-10',
+    city: 'Bangkok',
+    country: 'Thailand',
+    region: 'Asia',
+    costIndex: 2,
+    popularity: 'Very High',
+    image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=600&q=80',
+    description: 'A bustling capital known for ornate shrines, vibrant street life, and shopping.'
+  },
+  {
+    id: 'dest-11',
+    city: 'Barcelona',
+    country: 'Spain',
+    region: 'Europe',
+    costIndex: 3,
+    popularity: 'High',
+    image: 'https://images.unsplash.com/photo-1583422409516-2895a77efedd?auto=format&fit=crop&w=600&q=80',
+    description: 'Famed for Sagrada Familia cathedral, Gaudi architecture, and sandy beaches.'
+  },
+  {
+    id: 'dest-12',
+    city: 'Dubai',
+    country: 'United Arab Emirates',
+    region: 'Middle East',
+    costIndex: 5,
+    popularity: 'Very High',
+    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80',
+    description: 'An ultra-modern luxury hub featuring Burj Khalifa and massive shopping malls.'
+  },
+  {
+    id: 'dest-13',
+    city: 'Bali',
+    country: 'Indonesia',
+    region: 'Asia',
+    costIndex: 2,
+    popularity: 'Very High',
+    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80',
+    description: 'A tropical paradise of forested volcanic mountains, beaches, and coral reefs.'
+  },
+  {
+    id: 'dest-14',
+    city: 'Amsterdam',
+    country: 'Netherlands',
+    region: 'Europe',
+    costIndex: 4,
+    popularity: 'High',
+    image: 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=600&q=80',
+    description: 'Charming network of canals, artistic heritage, and historic narrow houses.'
+  },
+  {
+    id: 'dest-15',
+    city: 'Rio de Janeiro',
+    country: 'Brazil',
+    region: 'South America',
+    costIndex: 3,
+    popularity: 'Medium',
+    image: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=600&q=80',
+    description: 'Energetic seaside city famous for Copacabana, Carnival, and Christ the Redeemer.'
+  }
+];
+
+const DISCOVERABLE_ACTIVITIES: Record<string, Partial<Activity>[]> = {
+  paris: [
+    { name: 'Eiffel Tower Guided Summit Tour', category: 'Activities', duration: '3 hours', cost: 8000, description: 'Guided skip-the-line elevator entry to the summit deck.' },
+    { name: 'Louvre Museum Masterpieces Tour', category: 'Activities', duration: '2.5 hours', cost: 6500, description: 'See the Mona Lisa, Venus de Milo and other priceless works.' },
+    { name: 'Seine River Cruise with Dinner', category: 'Food', duration: '2 hours', cost: 9500, description: 'Gourmet 3-course meal on a glass-walled boat passing Paris landmarks.' },
+    { name: 'Palace of Versailles Half-Day Trip', category: 'Activities', duration: '4.5 hours', cost: 7200, description: 'Explore the Hall of Mirrors and magnificent gardens with audio guide.' },
+    { name: 'Montmartre Walking & Wine Tasting', category: 'Food', duration: '3 hours', cost: 5000, description: 'Walk artistic streets, visit vineyards, and taste French wines.' },
+    { name: 'Paris Metro Day Pass', category: 'Transport', duration: '1 day', cost: 1200, description: 'Unlimited transport inside Paris Zones 1-3.' }
+  ],
+  tokyo: [
+    { name: 'Shibuya Crossing & Hachiko Guided Tour', category: 'Activities', duration: '1.5 hours', cost: 1500, description: 'Explore Shibuya and local hidden alleyways with a guide.' },
+    { name: 'Sushi Dai Tsukiji Breakfast Experience', category: 'Food', duration: '1.5 hours', cost: 4500, description: 'World-class chef selection sushi breakfast at Outer Market.' },
+    { name: 'Robot Restaurant Cabaret Show', category: 'Activities', duration: '2 hours', cost: 6000, description: 'Sensory overload featuring giant robots, neon lights, and drum shows.' },
+    { name: 'Mt. Fuji & Hakone Guided Day Tour', category: 'Activities', duration: '10 hours', cost: 12000, description: 'Day trip to Fuji 5th station, Lake Ashi cruise, and cable car ride.' },
+    { name: 'Akihabara Anime & Gaming Tour', category: 'Activities', duration: '3 hours', cost: 3500, description: 'Visit maid cafes, retro arcades, and collector shops.' },
+    { name: 'JR Rail Pass (7 Days)', category: 'Transport', duration: '7 days', cost: 30000, description: 'Unlimited travel on Shinkansen and JR train lines across Japan.' }
+  ],
+  rome: [
+    { name: 'Colosseum & Roman Forum Walk', category: 'Activities', duration: '3 hours', cost: 5000, description: 'Walk the arena floor and hear stories of gladiators.' },
+    { name: 'Vatican Museums & Sistine Chapel Tour', category: 'Activities', duration: '4.5 hours', cost: 7500, description: 'Marvel at Michelangelo frescoes and Renaissance art galleries.' },
+    { name: 'Trastevere Food Tour & Wine Pairing', category: 'Food', duration: '3.5 hours', cost: 6800, description: 'Sample Roman specialties: Cacio e Pepe, supplì, pizza, and organic wines.' },
+    { name: 'Pasta & Tiramisu Making Class', category: 'Food', duration: '3 hours', cost: 5500, description: 'Roll your own pasta and construct tiramisu with a local Italian chef.' },
+    { name: 'Rome Hop-On Hop-Off Bus Tour', category: 'Transport', duration: '24 hours', cost: 2200, description: 'Sightseeing double-decker bus covering major landmarks.' }
+  ],
+  goa: [
+    { name: 'Dudhsagar Waterfalls Trek & Jeep Safari', category: 'Activities', duration: '6 hours', cost: 3000, description: 'Jeep ride through jungle to the four-tiered waterfall, including lunch.' },
+    { name: 'South Goa Heritage & Spice Plantation Tour', category: 'Activities', duration: '5 hours', cost: 1800, description: 'Visit historic Portuguese churches and enjoy organic buffet lunch.' },
+    { name: 'Scuba Diving at Grande Island', category: 'Activities', duration: '7 hours', cost: 4500, description: 'PADI guided shallow dives, boat trip, dolphin sighting, and BBQ lunch.' },
+    { name: 'Candolim Beach Water Sports Package', category: 'Activities', duration: '2 hours', cost: 2500, description: 'Parasailing, jet ski, banana boat ride, and bumper ride.' },
+    { name: 'Beachside Seafood Dinner at Curlies', category: 'Food', duration: '2 hours', cost: 1500, description: 'Fresh Goan fish curry, prawns, and local drinks by the waves.' }
+  ],
+  'new york': [
+    { name: 'Empire State Building Observatory Ticket', category: 'Activities', duration: '2 hours', cost: 3800, description: '360-degree views of Manhattan from the 86th floor open-air deck.' },
+    { name: 'Statue of Liberty & Ellis Island Ferry', category: 'Activities', duration: '4 hours', cost: 2500, description: 'Access to Liberty Island pedestal museum and Ellis Island national archives.' },
+    { name: 'Broadway Show (Wicked / Lion King)', category: 'Activities', duration: '2.5 hours', cost: 9500, description: 'Premium seats at a classic Broadway musical theatre show.' },
+    { name: 'Manhattan Helicopter Sightseeing Flight', category: 'Activities', duration: '15 mins', cost: 18000, description: 'Aerial tour of Statue of Liberty, Brooklyn Bridge, and Central Park.' },
+    { name: 'Chelsea Market & High Line Food Tour', category: 'Food', duration: '3 hours', cost: 6000, description: 'Eat local tacos, artisanal cheese, doughnuts, and walk the linear park.' },
+    { name: 'New York Subway Week Pass', category: 'Transport', duration: '7 days', cost: 2800, description: 'MTA unlimited subway and local bus pass.' }
+  ]
+};
+
+export const getCities = async (): Promise<Destination[]> => {
+  return DISCOVERABLE_CITIES;
+};
+
+export const getActivitiesForCity = async (cityName: string): Promise<Partial<Activity>[]> => {
+  const key = cityName.toLowerCase();
+  if (DISCOVERABLE_ACTIVITIES[key]) {
+    return DISCOVERABLE_ACTIVITIES[key];
+  }
+  // Default fallback activities for other cities
+  return [
+    { name: `${cityName} City Sightseeing Tour`, category: 'Activities', duration: '3 hours', cost: 2500, description: `Guided overview tour of ${cityName}'s historic points of interest.` },
+    { name: `Traditional Culinary Experience in ${cityName}`, category: 'Food', duration: '2 hours', cost: 3000, description: 'Sample authentic regional dishes at a popular local tavern.' },
+    { name: `Grand Plaza Hotel ${cityName}`, category: 'Accommodation', duration: '1 night', cost: 8000, description: 'Comfortable stay in the central neighborhood close to attractions.' },
+    { name: `Private Airport Shuttle Transfer`, category: 'Transport', duration: '45 mins', cost: 1500, description: 'Convenient one-way pickup or drop-off direct to your terminal.' }
+  ];
+};
+

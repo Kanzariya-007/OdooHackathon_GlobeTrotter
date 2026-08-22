@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft, Edit2, Share2, Calendar, MapPin, 
   DollarSign, Activity, ListOrdered, PiggyBank, Copy, Check, Compass,
-  Trash2, AlertCircle, Sun, SunDim, Moon, ArrowDown
+  Trash2, AlertCircle, Sun, SunDim, Moon, ArrowDown, Plus
 } from 'lucide-react';
 import { getTrip, deleteTrip } from '../services/tripApi';
 import { Trip } from '../types/trip';
@@ -12,6 +12,8 @@ import { Modal } from '../components/ui/Modal';
 import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 import { EmptyState } from '../components/ui/EmptyState';
+import { CityDiscoveryModal } from '../components/trips/CityDiscoveryModal';
+import { ActivityDiscoveryModal } from '../components/trips/ActivityDiscoveryModal';
 
 export const TripDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -27,6 +29,10 @@ export const TripDetails: React.FC = () => {
   // Delete Modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Discovery Modals state
+  const [isCityDiscoveryOpen, setIsCityDiscoveryOpen] = useState(false);
+  const [isActivityDiscoveryOpen, setIsActivityDiscoveryOpen] = useState(false);
 
   // Tab State
   const [activeTab, setActiveTab] = useState<'overview' | 'itinerary' | 'budget' | 'timeline'>('overview');
@@ -267,7 +273,18 @@ export const TripDetails: React.FC = () => {
 
               {/* Destinations visited */}
               <div className="bg-white border border-slate-100 rounded-xl p-5 shadow-xs">
-                <h3 className="font-bold text-slate-800 text-sm mb-3">Cities Explored</h3>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-bold text-slate-800 text-sm">Cities Explored</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCityDiscoveryOpen(true)}
+                    leftIcon={<Plus size={12} />}
+                    className="text-[10px] font-bold py-1.5"
+                  >
+                    Add Stop
+                  </Button>
+                </div>
                 {trip.destinations?.length === 0 ? (
                   <div className="text-center py-4 text-xs text-slate-400">
                     No cities added to this trip stops yet.
@@ -327,16 +344,56 @@ export const TripDetails: React.FC = () => {
         {/* Itinerary Tab */}
         {activeTab === 'itinerary' && (
           <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs animate-in fade-in duration-200">
-            <div className="border-b border-slate-100 pb-4 mb-5">
-              <h3 className="font-bold text-slate-800 text-sm">Trip Itinerary</h3>
-              <p className="text-xs text-slate-400 mt-1">Day-by-day scheduled activities and locations for your journey.</p>
+            <div className="border-b border-slate-100 pb-4 mb-5 flex justify-between items-center">
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">Trip Itinerary</h3>
+                <p className="text-xs text-slate-400 mt-1">Day-by-day scheduled activities and locations for your journey.</p>
+              </div>
+              {trip.destinations && trip.destinations.length > 0 && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setIsActivityDiscoveryOpen(true)}
+                  leftIcon={<Plus size={14} />}
+                  className="font-semibold text-xs py-2 px-3"
+                >
+                  Schedule Activity
+                </Button>
+              )}
             </div>
             
             {!trip.activities || trip.activities.length === 0 ? (
               <EmptyState
                 title="No scheduled activities yet"
-                description="Activities planned in the stops will be scheduled here to construct your day-to-day agenda."
+                description={
+                  trip.destinations && trip.destinations.length > 0 
+                    ? "Activities planned in the stops will be scheduled here to construct your day-to-day agenda."
+                    : "Please add at least one city stop under the Overview tab before scheduling activities."
+                }
                 icon={<Activity size={32} />}
+                action={
+                  trip.destinations && trip.destinations.length > 0 ? (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setIsActivityDiscoveryOpen(true)}
+                      leftIcon={<Plus size={14} />}
+                      className="font-semibold"
+                    >
+                      Schedule Activity
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setIsCityDiscoveryOpen(true)}
+                      leftIcon={<Plus size={14} />}
+                      className="font-semibold"
+                    >
+                      Add City Stop
+                    </Button>
+                  )
+                }
               />
             ) : (
               <div className="flex flex-col gap-6">
@@ -698,6 +755,23 @@ export const TripDetails: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      {trip && (
+        <>
+          <CityDiscoveryModal
+            isOpen={isCityDiscoveryOpen}
+            onClose={() => setIsCityDiscoveryOpen(false)}
+            trip={trip}
+            onTripUpdated={(updatedTrip) => setTrip(updatedTrip)}
+          />
+          <ActivityDiscoveryModal
+            isOpen={isActivityDiscoveryOpen}
+            onClose={() => setIsActivityDiscoveryOpen(false)}
+            trip={trip}
+            onTripUpdated={(updatedTrip) => setTrip(updatedTrip)}
+          />
+        </>
+      )}
 
     </div>
   );
