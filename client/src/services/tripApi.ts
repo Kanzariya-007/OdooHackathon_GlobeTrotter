@@ -382,7 +382,7 @@ export const getTrip = async (id: string): Promise<Trip> => {
 export const createTrip = async (data: TripFormData): Promise<Trip> => {
   try {
     const res = await api.post('/trips', data);
-    return res.data;
+    return res.data.trip || res.data;
   } catch (error) {
     console.warn('[API] Real API createTrip failed, creating locally', error);
 
@@ -422,7 +422,7 @@ export const createTrip = async (data: TripFormData): Promise<Trip> => {
 export const updateTrip = async (id: string, data: Partial<Trip>): Promise<Trip> => {
   try {
     const res = await api.put(`/trips/${id}`, data);
-    return res.data;
+    return res.data.trip || res.data;
   } catch (error) {
     console.warn(`[API] Real API updateTrip(${id}) failed, updating locally`, error);
 
