@@ -5,6 +5,8 @@ import { getTrip, updateTrip } from '../services/tripApi';
 import { TripForm } from '../components/trips/TripForm';
 import { Trip, TripFormData } from '../types/trip';
 import { Button } from '../components/ui/Button';
+import { Loading } from '../components/Loading';
+import { Error } from '../components/Error';
 
 export const EditTrip: React.FC = () => {
   const navigate = useNavigate();
@@ -39,8 +41,12 @@ export const EditTrip: React.FC = () => {
     setIsUpdating(true);
     setError(null);
     try {
-      const updatedBudget = trip.budget
-        ? { ...trip.budget, totalBudget: formData.totalBudget ?? trip.budget.totalBudget }
+      // Structure the budget properly if it gets updated or falls back
+      const updatedBudget = trip.budget 
+        ? {
+            ...trip.budget,
+            totalBudget: formData.totalBudget || trip.budget.totalBudget
+          }
         : undefined;
 
       await updateTrip(id, {
@@ -49,9 +55,10 @@ export const EditTrip: React.FC = () => {
         endDate: formData.endDate,
         description: formData.description,
         coverImage: formData.coverImage,
-        ...(updatedBudget && { budget: updatedBudget }),
+        budget: updatedBudget
       });
 
+      // Redirect back to Trip Details
       navigate(`/trips/${id}`);
     } catch (err: any) {
       console.error(err);
@@ -62,60 +69,54 @@ export const EditTrip: React.FC = () => {
   };
 
   if (isLoading) {
+    return <Loading message="Retrieving trip configuration..." />;
+  }
+
+  if (error && !trip) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <svg className="animate-spin h-8 w-8 text-indigo-600 mb-4" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-        <p className="text-sm font-medium text-slate-500">Loading trip data...</p>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Error 
+          title="Error Loading Trip" 
+          message={error} 
+          onRetry={() => window.location.reload()} 
+        />
       </div>
     );
   }
 
-  if (!trip) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center gap-4">
-        <AlertCircle size={40} className="text-red-400" />
-        <h3 className="font-bold text-slate-800 text-base">Trip Not Found</h3>
-        <p className="text-sm text-slate-400 leading-relaxed">{error || 'Could not find the trip you are trying to edit.'}</p>
-        <Button variant="primary" size="sm" onClick={() => navigate('/trips')}>
-          Back to My Trips
-        </Button>
-      </div>
-    );
-  }
-
-  const initialFormValues: Partial<TripFormData> = {
-    name: trip.name,
-    startDate: trip.startDate,
-    endDate: trip.endDate,
-    description: trip.description || '',
-    coverImage: trip.coverImage || '',
-    totalBudget: trip.budget?.totalBudget ?? 50000,
-  };
+  // Pre-map fields to fit TripFormData props
+  const initialFormValues: Partial<TripFormData> = trip 
+    ? {
+        name: trip.name,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        description: trip.description || '',
+        coverImage: trip.coverImage || '',
+        totalBudget: trip.budget?.totalBudget
+      }
+    : {};
 
   return (
     <div className="flex flex-col gap-6 text-left max-w-3xl mx-auto">
       
-      {/* Header */}
+      {/* Header and Back Button */}
       <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => navigate(`/trips/${id}`)}
-          className="p-2 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0"
+          onClick={() => navigate(-1)}
+          className="p-2 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-lg flex items-center justify-center"
         >
           <ArrowLeft size={16} />
         </Button>
         <div>
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Edit Trip</h2>
-          <p className="text-xs text-slate-400 font-medium mt-0.5 truncate max-w-xs">{trip.name}</p>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Edit Trip: {trip?.name}</h2>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">Modify the duration, name, or metadata of this travel itinerary.</p>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 text-sm flex items-start gap-2.5">
+        <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs flex items-start gap-2.5">
           <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
           <span className="font-semibold">{error}</span>
         </div>
@@ -126,8 +127,7 @@ export const EditTrip: React.FC = () => {
         <TripForm
           initialData={initialFormValues}
           onSubmit={handleFormSubmit}
-          onCancel={() => navigate(`/trips/${id}`)}
-          submitLabel="Save Changes"
+          submitLabel="Update Itinerary"
           isLoading={isUpdating}
         />
       </div>
