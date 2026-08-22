@@ -43,7 +43,7 @@ const POPULAR_DESTINATIONS: Destination[] = [
     region: 'Asia',
     costIndex: 4,
     popularity: 'Very High',
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80',
     description: 'A neon-lit metropolis blending futuristic skyscrapers with historic temples.'
   },
   {
@@ -194,7 +194,7 @@ const INITIAL_TRIPS: Trip[] = [
         country: 'Japan',
         region: 'Asia',
         costIndex: 4,
-        image: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=600&q=80'
+        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80'
       }
     ],
     activities: [
