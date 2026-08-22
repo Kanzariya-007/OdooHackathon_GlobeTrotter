@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRouter from './routes/auth.routes';
 import tripRouter from './routes/trip.routes';
+import tripStopRouter from './routes/tripStop.routes';
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.json());
 // Mount routes
 app.use('/api/auth', authRouter);
 app.use('/api/trips', tripRouter);
+app.use('/api/trips', tripStopRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
