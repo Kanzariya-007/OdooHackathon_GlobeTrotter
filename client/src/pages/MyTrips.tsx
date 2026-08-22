@@ -103,9 +103,9 @@ export const MyTrips: React.FC = () => {
           <div className="bg-indigo-50 p-4 rounded-full text-indigo-500 mb-4">
             <Compass size={40} className="animate-spin-slow" />
           </div>
-          <h3 className="text-base font-bold text-slate-800 mb-1">No trips found</h3>
+          <h3 className="text-base font-bold text-slate-800 mb-1">No trips yet</h3>
           <p className="text-xs text-slate-400 max-w-sm mb-6 leading-relaxed">
-            You haven't planned any trips yet! Start structuring your travel bucket list by building your very first itinerary now.
+            Start planning your next adventure.
           </p>
           <Button
             variant="primary"
@@ -113,7 +113,7 @@ export const MyTrips: React.FC = () => {
             leftIcon={<Plus size={16} />}
             className="font-semibold"
           >
-            Plan Your First Trip
+            Create Trip
           </Button>
         </div>
       ) : (

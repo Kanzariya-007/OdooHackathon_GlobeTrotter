@@ -26,6 +26,7 @@ export interface Activity {
   startTime?: string; // e.g. "10:00"
   endTime?: string; // e.g. "12:00"
   date?: string; // e.g. "2026-09-10"
+  location?: string;
 }
 
 export interface Budget {
